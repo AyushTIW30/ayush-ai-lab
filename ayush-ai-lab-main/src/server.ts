@@ -87,42 +87,38 @@ async function handleAskAyush(request: Request, env: unknown) {
     return json({ error: "GEMINI_API_KEY is not configured on the server" }, 500);
   }
 
-  const model = getGeminiModel(env);
   const systemInstruction = `You are Ayush AI, the portfolio assistant for Ayush Tiwari. Answer only about Ayush, his skills, education, projects, contact details, resume, and hiring fit. Use the knowledge base below as your source of truth. If the user asks unrelated questions, politely redirect them to Ayush's profile/work. Be concise, natural, honest, and recruiter-friendly. Do not invent private data, salaries, company claims, or fake metrics.\n\n${AYUSH_KNOWLEDGE_BASE}`;
 
-  const geminiResponse = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
+  const groqResponse = await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
       body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemInstruction }],
-        },
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: message }],
-          },
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: message },
         ],
-        generationConfig: {
-          temperature: 0.35,
-          maxOutputTokens: 280,
-        },
+        temperature: 0.35,
+        max_tokens: 280,
       }),
     },
   );
 
-  if (!geminiResponse.ok) {
-    const details = await geminiResponse.text().catch(() => "");
-    console.error("Gemini API error", geminiResponse.status, details);
-    return json({ error: "Gemini request failed. Check GEMINI_API_KEY and GEMINI_MODEL." }, 502);
+  if (!groqResponse.ok) {
+    const details = await groqResponse.text().catch(() => "");
+    console.error("Groq API error", groqResponse.status, details);
+    return json({ error: "Groq request failed. Check GROQ_API_KEY." }, 502);
   }
 
-  const result = (await geminiResponse.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  const result = (await groqResponse.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
   };
-  const answer = result.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join(" ").trim();
+  const answer = result.choices?.[0]?.message?.content?.trim();
 
   return json({ answer: answer || "I could not generate a response. Please ask about Ayush's skills, projects, education, or contact details." });
 }
@@ -166,4 +162,5 @@ export default {
     }
   },
 };
+
 
