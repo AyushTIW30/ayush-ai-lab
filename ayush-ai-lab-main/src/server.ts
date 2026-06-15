@@ -1,4 +1,4 @@
-import "./lib/error-capture";
+﻿import "./lib/error-capture";
 
 import process from "node:process";
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -10,6 +10,7 @@ type ServerEntry = {
 
 type RuntimeEnv = {
   GEMINI_API_KEY?: string;
+  GROQ_API_KEY?: string;
   GEMINI_MODEL?: string;
 };
 
@@ -48,6 +49,11 @@ function getGeminiApiKey(env: unknown) {
   return process.env.GEMINI_API_KEY || runtimeEnv?.GEMINI_API_KEY;
 }
 
+function getGroqApiKey(env: unknown) {
+  const runtimeEnv = env as RuntimeEnv | undefined;
+  return process.env.GROQ_API_KEY || runtimeEnv?.GROQ_API_KEY;
+}
+
 function getGeminiModel(env: unknown) {
   const runtimeEnv = env as RuntimeEnv | undefined;
   return process.env.GEMINI_MODEL || runtimeEnv?.GEMINI_MODEL || "gemini-1.5-flash";
@@ -76,7 +82,7 @@ async function handleAskAyush(request: Request, env: unknown) {
   if (!message) return json({ error: "Message is required" }, 400);
   if (message.length > 800) return json({ error: "Message is too long" }, 400);
 
-  const apiKey = getGeminiApiKey(env);
+  const apiKey = getGroqApiKey(env);
   if (!apiKey) {
     return json({ error: "GEMINI_API_KEY is not configured on the server" }, 500);
   }
@@ -122,7 +128,7 @@ async function handleAskAyush(request: Request, env: unknown) {
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
+// {"unhandled":true,"message":"HTTPError"} â€” try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -160,3 +166,4 @@ export default {
     }
   },
 };
+
