@@ -20,7 +20,7 @@ Name: Ayush Tiwari
 Email: ayushtiwariatcoon@gmail.com
 GitHub: https://github.com/AyushTIW30
 LinkedIn: https://linkedin.com/in/ayush-tiwari-2301222ba
-Education: B.Tech in Information Technology, RGPV, 2026 graduate, CGPA 7.68.
+Education: B.Tech in Information Technology, RGPV, 2026 graduate, CGPA 8.01.
 Positioning: AI + Backend Developer / Python Developer / fresher with practical AI and backend projects.
 Core skills: Python, FastAPI, Django, Node.js, React basics, SQL, MySQL, SQLite, PostgreSQL basics, Pandas, NumPy, Scikit-learn, Streamlit, Git, GitHub, Postman, n8n, RAG pipelines, LLM integrations, Gemini API.
 Projects:
@@ -42,13 +42,15 @@ async function getServerEntry(): Promise<ServerEntry> {
 }
 
 function getGeminiApiKey(env: unknown) {
+  // On Vercel, environment variables are in process.env, not the env object.
+  // Check process.env first, then fall back to the runtime env object (Cloudflare Workers style).
   const runtimeEnv = env as RuntimeEnv | undefined;
-  return runtimeEnv?.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+  return process.env.GEMINI_API_KEY || runtimeEnv?.GEMINI_API_KEY;
 }
 
 function getGeminiModel(env: unknown) {
   const runtimeEnv = env as RuntimeEnv | undefined;
-  return runtimeEnv?.GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  return process.env.GEMINI_MODEL || runtimeEnv?.GEMINI_MODEL || "gemini-1.5-flash";
 }
 
 function json(data: unknown, status = 200) {

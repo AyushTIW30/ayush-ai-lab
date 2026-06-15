@@ -23,7 +23,7 @@ export function About() {
             className="lg:col-span-2 space-y-5 text-muted-foreground leading-relaxed"
           >
             <p>
-              I'm <span className="text-foreground font-medium">Ayush Tiwari</span> — a B.Tech IT graduate from RGPV (CGPA: 7.68), focused on practical AI/backend products, automation workflows, and production-style systems.
+              I'm <span className="text-foreground font-medium">Ayush Tiwari</span> — a B.Tech IT graduate from RGPV (CGPA: 8.01), focused on practical AI/backend products, automation workflows, and production-style systems.
             </p>
             <p>
               My work spans Python, FastAPI, Django, Node.js, SQL, and the backend stack: clean APIs,
