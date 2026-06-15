@@ -11,7 +11,9 @@ export default defineConfig({
     tanstackStart(),
     react(),
     tailwindcss(),
-    nitro(),
+    nitro({
+      preset: "vercel",
+    }),
   ],
   environments: {
     ssr: {
